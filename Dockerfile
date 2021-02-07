@@ -4,8 +4,10 @@ USER root
 RUN npm i -g pnpm typescript
 RUN apk add --no-cache python3 make g++
 WORKDIR /home/app
-COPY . /home/app/
+COPY package.json /home/app/
+COPY pnpm-lock.yaml /home/app/
 RUN pnpm i
+COPY . /home/app/
 RUN pnpm build
 
 ENTRYPOINT [ "node" ]
