@@ -6,6 +6,7 @@ RUN apk add --no-cache python3 make g++
 WORKDIR /home/app
 COPY . /home/app/
 RUN pnpm i
+RUN pnpm build
 
 ENTRYPOINT [ "node" ]
 CMD [ "/home/app/build/bot.js" ]
