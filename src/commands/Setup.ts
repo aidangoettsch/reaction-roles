@@ -1,5 +1,5 @@
 import Command from "./Command";
-import Discord, {MessageEmbed} from "discord.js";
+import Discord, {MessageEmbed, Permissions} from "discord.js";
 import quickDb from "quick.db"
 
 const emojiRegex = /<:.+:([0-9]+)>/
@@ -15,7 +15,9 @@ export default class Setup extends Command {
   }
 
   async execute(msg: Discord.Message, args: string[]): Promise<void> {
-    console.log(args)
+    if (!msg.member) throw new Error(`Command can only be used in a guild`)
+    if (!msg.member.hasPermission(Permissions.FLAGS.MANAGE_ROLES)) throw new Error(`You don't have permission to use this command`)
+
     if (args.length !== 3) {
       throw new Error(`Incorrect usage! ${this.commandHandler.prefix}${this.info.fullCommand}`)
     }
