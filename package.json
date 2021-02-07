@@ -1,0 +1,19 @@
+{
+  "name": "reaction-roles",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start":  "node build/bot.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^14.14.25",
+    "discord.js": "^12.5.1",
+    "dotenv": "^8.2.0",
+    "quick.db": "^7.1.3"
+  }
+}
