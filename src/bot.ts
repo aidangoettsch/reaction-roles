@@ -3,10 +3,12 @@ import {Client, MessageEmbed, Permissions, Snowflake} from "discord.js"
 import dotenv from "dotenv"
 import util from "util";
 import CommandHandler from "./CommandHandler";
+import debugBase from "debug";
 
 dotenv.config()
 
 const prefix = process.env.PREFIX || "&"
+const debug = debugBase('reaction-roles:reactions')
 
 interface MessageInfo {
   roles: {[emoji: string]: Snowflake}
@@ -31,6 +33,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
   }
 
+  if (user.bot) return
+
   const message = reaction.message
   const messageInfo = quickDb.get(`${message.id}`) as MessageInfo
 
@@ -39,8 +43,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
   const roleId = messageInfo.roles[emoji]
   if (!roleId) {
     await reaction.remove()
+    debug(`Invalid reaction ${emoji} on ${message.id}`)
     return
   }
+
+  debug(`Added role ${roleId} to ${user.username}#${user.discriminator} due to reaction ${emoji} on ${message.id}`)
+
   message.guild?.member(user.id)?.roles.add(roleId)
 })
 
@@ -54,6 +62,8 @@ client.on('messageReactionRemove', async (reaction, user) => {
     }
   }
 
+  if (user.bot) return
+
   const message = reaction.message
   const messageInfo = quickDb.get(`${message.id}`) as MessageInfo
 
@@ -64,6 +74,9 @@ client.on('messageReactionRemove', async (reaction, user) => {
     await reaction.remove()
     return
   }
+
+  debug(`Removed role ${roleId} from ${user.username}#${user.discriminator} due to reaction ${emoji} on ${message.id}`)
+
   message.guild?.member(user.id)?.roles.remove(roleId)
 })
 

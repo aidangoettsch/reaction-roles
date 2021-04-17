@@ -1,6 +1,9 @@
 import Command from "./Command";
 import Discord, {MessageEmbed, Permissions} from "discord.js";
 import quickDb from "quick.db"
+import debugBase from "debug";
+
+const debug = debugBase('reaction-roles:setup')
 
 const emojiRegex = /<:.+:([0-9]+)>/
 const roleRegex = /<@&([0-9]+)>/
@@ -22,6 +25,10 @@ export default class Setup extends Command {
       throw new Error(`Incorrect usage! ${this.commandHandler.prefix}${this.info.fullCommand}`)
     }
 
+    if (!msg.guild) {
+      throw new Error(`This command needs to be run in a guild`)
+    }
+
     const messageId = args[0]
     let emoji = args[1]
     const role = args[2]
@@ -37,6 +44,17 @@ export default class Setup extends Command {
     }
 
     quickDb.set(`${messageId}.roles.${emoji}`, roleId)
+    debug(`Registered ${emoji} to ${roleId} for ${messageId}`)
+
+    await Promise.all(msg.guild.channels.cache.map(async channel => {
+      if (channel.isText()) {
+        try {
+          const message = await channel.messages.fetch(messageId)
+          debug(`Found ${messageId} in #${channel.name}`)
+          await message.react(emoji)
+        } catch {}
+      }
+    }))
 
     await msg.channel.send(new MessageEmbed({
       title: ':bulb: __❱❱ INFO ❱❱__',

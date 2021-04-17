@@ -2,6 +2,9 @@ import Discord from "discord.js"
 import Help from "./commands/Help";
 import Command from "./commands/Command";
 import Setup from "./commands/Setup";
+import debugBase from "debug";
+
+const debug = debugBase('reaction-roles:commands')
 
 const commands = [
     Help,
@@ -23,6 +26,7 @@ export default class CommandHandler {
     execute(commandName: string, msg: Discord.Message, args: string[]): Promise<void> {
         const command = this.commandMap.get(commandName)
         if (!command) return Promise.reject(new Error("No such command"))
+        debug(`Running command ${commandName} ${args.join(' ')}`)
         return command.execute(msg, args)
     }
 }
